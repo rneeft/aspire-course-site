@@ -3,7 +3,7 @@
 title: Aspire Workshop 
 email: rick.neeft@outlook.com
 description: "Aspire workshop course site"
-baseurl: "/aspire-workshop" # the subpath of your site, e.g. /blog
+baseurl: "/aspire-course-site" # the subpath of your site, e.g. /blog
 url: "https://www.rickneeft.dev" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  rneeft
 
