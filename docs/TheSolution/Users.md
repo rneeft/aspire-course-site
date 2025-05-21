@@ -1,5 +1,5 @@
 ---
-title: Identity Provider
+title: Users
 layout: home
 parent: The Solution
 nav_order: 1.2

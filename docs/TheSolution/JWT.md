@@ -1,7 +1,7 @@
 ---
 title: JSON Web Token
 layout: home
-parent: Identity Provider
+parent: Users
 nav_order: 1.2.1
 ---
 
