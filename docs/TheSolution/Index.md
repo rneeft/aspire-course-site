@@ -25,10 +25,13 @@ graph TD;
     accTitle: System as Identity Provider and Data Flow
     accDescr: The system acts as an identity provider. Health insurers upload data files, which the system processes and stores in the database. Authenticated healthcare providers can query the database for their patients.
     HI[Health Insurers] -- Upload Data Files --> S(System)
-    S -- Process Data Files --> DB[(Database)]
+    S -- Process Data Files --> DB[(Insurance/User data)]
+    S -- Searching --> DB[(Insurance/User data)]
+    S -- User data --> DB[(Insurance/User data)]
     S -- Authenticate --> HI[Health Insurers]
     S -- Authenticate --> HCP[Healthcare Providers]
-    HCP -- Query for Patients --> DB
+    S -- Registers --> HCP[Healthcare Providers]
+    HCP -- Query for Patients --> S
     S -- Acts as --> IDP[Identity Provider]
 ```
 
