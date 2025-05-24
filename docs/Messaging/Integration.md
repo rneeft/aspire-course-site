@@ -2,14 +2,12 @@
 title: Integration
 parent: Messaging
 layout: default
-nav_order: 4.1
+nav_order: 4.2
 ---
 
-# Integration
+# NServiceBus Integration
 
 In this lesson, you will integrate NServiceBus into your solution to handle DataFile processing. When a health insurer uploads a DataFile, the API will validate it, split it into parts, and process each part as a command using NServiceBus.
-
----
 
 ## Step 1: Add a New Database for Messaging
 
@@ -22,13 +20,45 @@ In the Aspire AppHost, create a new database for messages and add a reference to
 ```csharp
 var sqlScript = await File.ReadAllTextAsync("nservicebus.sql");
 var messages = sqlServer
-    .AddDatabase("messages")
+    .AddDatabase("MessagesDb")
     .WithCreationScript(sqlScript);
 ```
 
-- Add the messages database as a reference to the API project and use `WaitFor` to ensure it is ready.
+- Add the messages database `WithReference` to the API project and use `WaitFor` to ensure it wait for it to be ready.
 
----
+
+## Step 2: Create a Shared Class Library
+
+Create a new class library project for shared commands between projects.
+
+- Name it something like `InsuranceDetails.Messages`.
+- Add the NServiceBus package: `dotnet add package NServiceBus`
+- Add a `Commands` folder and in the folder
+- Add a `UpdateBasicHealthInsuranceCommand` class
+```csharp
+public class UpdateBasicHealthInsuranceCommand : ICommand
+{
+    public required string Bsn { get; init; }
+    public required int HealthInsuranceId { get; init; }
+    public required DateTime AsFromDate { get; init; }
+    public required DateTime TillDate { get; init; }
+}
+```
+- Add a `UpdateSupplementaryHealthInsuranceCommand` class
+```csharp
+public class UpdateSupplementaryHealthInsuranceCommand : ICommand
+{
+    public required string Bsn { get; init; }
+    public required int HealthInsuranceId { get; init; }
+    public required DateTime AsFromDate { get; init; }
+    public required DateTime TillDate { get; init; }
+    public required string WhatIsCovered { get; init; }
+    public required int PercentageCovered { get; init; }
+    public required int MaxAmount { get; init; }
+}
+``` 
+
+- Reference this library from both the API and processor projects.
 
 ## Step 2: Add NServiceBus Packages
 
@@ -40,74 +70,133 @@ dotnet add package NServiceBus.SqlServer
 dotnet add package NServiceBus.Extensions.Hosting
 ```
 
----
+## Step 3: Configure NServiceBus in the API
 
-## Step 3: Create a Shared Class Library
-
-Create a new class library project for shared commands between projects.
-
-- Name it something like `Messaging.Commands`.
-- Add a `ProcessDataFile` command class to this library.
-- Reference this library from both the API and processor projects.
-
----
-
-## Step 4: Configure NServiceBus in the API
-
-Add the following NServiceBus configuration to your API project:
+Add the following NServiceBus configuration to your API project and make sure the method is called:
 
 ```csharp
-var endpointConfiguration = new EndpointConfiguration("DataFileUploadEndpoint");
-endpointConfiguration.UseSerialization<SystemJsonSerializer>();
-endpointConfiguration.DisableFeature<AutoSubscribe>();
-endpointConfiguration.DisableFeature<Audit>();
-endpointConfiguration.SendFailedMessagesTo("Error");
+static void AddNServiceBus(WebApplicationBuilder builder)
+{
+    var connectionString = builder.Configuration.GetConnectionString("MessagesDb") ?? 
+                           throw new InvalidOperationException("No connection string configured");
+    
+    var endpointConfiguration = new EndpointConfiguration("DataFileUploadEndpoint");
+    endpointConfiguration.UseSerialization<SystemJsonSerializer>();
+    endpointConfiguration.SendOnly();
 
-var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
-    .ConnectionString(connectionString)
-    .DefaultSchema("dbo")
-    .Transactions(TransportTransactionMode.SendsAtomicWithReceive);
+    var transport = endpointConfiguration.UseTransport<SqlServerTransport>()
+        .ConnectionString(connectionString)
+        .DefaultSchema("dbo")
+        .Transactions(TransportTransactionMode.SendsAtomicWithReceive);
 
-var delayedDelivery = transport.NativeDelayedDelivery();
-delayedDelivery.TableSuffix("Delayed");
+    var delayedDelivery = transport.NativeDelayedDelivery();
+    delayedDelivery.TableSuffix("Delayed");
 
-var routing = transport.Routing();
-routing.RouteToEndpoint(typeof(ProcessDataFile), "DataFileProcessorEndpoint");
+    var routing = transport.Routing();
+    routing.RouteToEndpoint(typeof(UpdateSupplementaryHealthInsuranceCommand), "DataFileProcessorEndpoint");
+    routing.RouteToEndpoint(typeof(UpdateBasicHealthInsuranceCommand), "DataFileProcessorEndpoint");
 
-builder.UseNServiceBus(endpointConfiguration);
+    builder.UseNServiceBus(endpointConfiguration);
+}
 ```
 
----
+## Step 5: Update the processing of the DataFile
+We still need to create an new implementation of the `IDataFileService`:
 
-## Step 5: Add a Console Application for Processing
-
-Create a new console application to process the commands.
-
-- Add the NServiceBus NuGet package to the console app.
-- Replace `program.cs` with:
-
+- Add a new class to `InsuranceDetails.Api.DataFiles` names: `NServiceBusDataFileService`
 ```csharp
-var builder = Host.CreateApplicationBuilder(args);
+using FluentValidation;
+using InsuranceDetails.Messages.Commands;
 
-var endpointConfiguration = NServiceBusConfig.Configuration("DataFileProcessorEndpoint");
-builder.UseNServiceBus(endpointConfiguration);
+namespace InsuranceDetails.Api.DataFiles;
 
-await builder.Build().RunAsync();
+public class NServiceBusDataFileService : IDataFileService
+{
+    private readonly IValidator<DataFile> _validator;
+    private readonly IMessageSession _messageSession;
+
+    public NServiceBusDataFileService(IValidator<DataFile> validator, IMessageSession messageSession)
+    {
+        _validator = validator;
+        _messageSession = messageSession;
+    }
+
+    public async Task<bool> ProcessDataFileAsync(DataFile dataFile, int healthInsurerId)
+    {
+        var validationResult = await _validator.ValidateAsync(dataFile);
+        if (!validationResult.IsValid)
+        {
+            return false;
+        }
+
+        foreach (var citizenDto in dataFile.Citizens)
+        {
+            if (citizenDto.BasicHealthInsurance is not null)
+            {
+                var command = new UpdateBasicHealthInsuranceCommand
+                {
+                    Bsn = citizenDto.Bsn,
+                    HealthInsuranceId = healthInsurerId,
+                    AsFromDate = citizenDto.BasicHealthInsurance.AsFromDate,
+                    TillDate = citizenDto.BasicHealthInsurance.TillDate
+                };
+                await _messageSession.Send(command);
+            }
+
+            foreach (var supplementaryInsurance in citizenDto.SupplementaryHealthInsurances)
+            {
+                var command = new UpdateSupplementaryHealthInsuranceCommand
+                {
+                    Bsn = citizenDto.Bsn,
+                    HealthInsuranceId = healthInsurerId,
+                    AsFromDate = supplementaryInsurance.AsFromDate,
+                    TillDate = supplementaryInsurance.TillDate,
+                    WhatIsCovered = supplementaryInsurance.WhatIsCovered,
+                    PercentageCovered = supplementaryInsurance.PercentageCovered,
+                    MaxAmount = supplementaryInsurance.MaxAmount
+                };
+                await _messageSession.Send(command);
+            }
+        }
+
+        return true;
+    }
+}
 ```
 
-- Copy any necessary database setup files and ensure the processor can access the messages database.
+- Register the new `NServiceBusDataFileService` to the Dependency Injector to file `DataFileServiceExtensions`.
 
----
+## Step 5: Lets test the application
+Let's review what we've accomplished so far with NServiceBus:
 
-## Step 6: Add a Command Handler
+- We set up a dedicated messages database and configured NServiceBus to use it.
+- We created shared command classes for processing health insurance data.
+- We updated the API to send commands to NServiceBus when a DataFile is uploaded.
+- We implemented a service that validates and splits the DataFile, sending each part as a command for processing.
 
-In the processor project, add a new command handler for the `ProcessDataFile` command.
+Now it's time to test the integration:
 
-- Implement the handler by creating a class that implements `IHandleMessages<ProcessDataFile>`.
-- Add your processing logic inside the `Handle` method.
+1. **Start the Application**  
+   Make sure all your services (API, processor, database) are running.
 
----
+2. **Authenticate with the API**  
+   Use Postman to log in to the service. If you don't have an account yet, register a new one.
 
-## Next Steps
+3. **Create a Health Insurer**  
+   Use the appropriate API endpoint in Postman to create a new HealthInsurer.
 
-You have now set up NServiceBus for distributed DataFile processing. In the next lesson, you will test the integration and monitor message flow using the Aspire dashboard.
+4. **Upload a DataFile**  
+   Use the DataFile upload endpoint to send a file.  
+   The API will validate the file and, if valid, send commands to NServiceBus for processing.
+
+If everything is set up correctly, your uploaded DataFile will be processed asynchronously using NServiceBus, and you can monitor the results in your database and logs.
+
+In order to see the data execute the following SQL query:
+
+```sql
+SELECT *
+FROM [MessagesDb].[dbo].[DataFileProcessorEndpoint]
+```
+
+## Next steps
+The commands are now being send to `NServiceBus` in the next section a processor is made to handle the messages.

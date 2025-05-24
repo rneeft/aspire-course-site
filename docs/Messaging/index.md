@@ -24,9 +24,8 @@ graph TD;
     IDP(IdentityProvider) -- userdata --> DBIDP[(User data)]
 ```
 
-> **Note:** API key verification remains a responsibility of the API.
-
----
+{: .highlight }
+> API key verification remains a responsibility of the API.
 
 ## Messaging
 
