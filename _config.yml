@@ -6,6 +6,7 @@ description: "Aspire workshop course site"
 baseurl: "/aspire-course-site" # the subpath of your site, e.g. /blog
 url: "https://www.rickneeft.dev" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  rneeft
+favicon_ico: favicon.ico
 
 defaults:
   - scope:
