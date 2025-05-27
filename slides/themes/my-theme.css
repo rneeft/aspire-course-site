@@ -25,6 +25,7 @@ img[alt~="center"] {
 }
 .bi-linkedin { color: #0a66c2; }
 .bi-browser-chrome { color: #fbc31c; }
+.bi-buildings { font-size: 5em;}
 
 svg[id^="mermaid-"] { 
   max-width: 960px; 

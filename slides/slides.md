@@ -22,6 +22,8 @@ theme: my-theme
 
 # Agenda
 
+- Gymnastics
+- Theory
 - Introduction
 - Case
 - Give it a go
@@ -31,7 +33,169 @@ theme: my-theme
 
 ---
 
-# Course
+# Gymnastics
+- Who is using Windows
+
+---
+
+# Gymnastics
+- Windows User: Who knows what WSL is?
+
+---
+
+# Gymnastics
+- Who is using Linux
+
+---
+
+# Gymnastics
+- Who is using MacOS
+
+---
+
+# Gymnastics
+- Who is using dotnet for programming?
+
+---
+
+# Gymnastics
+- Who is using Java for programming?
+
+---
+
+# Gymnastics
+- Who is using something else for programming?
+
+---
+
+# Gymnastics
+- Who knows what Docker is?
+
+---
+
+# Gymnastics
+- Who knows what Virtual machines are?
+
+---
+
+# In the early days
+
+- Real hardware - Bare metal
+- Apache server / Internet Information Services (IIS)
+
+---
+
+# Virtual machines
+
+- (multiple) virtual OS on top of a OS -> hypervisor 
+- Real hardware virtualised
+
+---
+
+
+# Today Docker
+
+![bg left:40% background-size: contain](img/docker-mark-blue.png)
+- Platform for developing, shipping and running application
+- Package with loosely isolated environments: containers
+- Containers are 'lightweight' and portable.
+- IS not virtual machine
+
+---
+# Dockerfile
+
+- Recipe
+- Describes how to build an docker image
+- Docker image: read-only instructions to create the container
+---
+
+# Dockerfile - Example
+
+```dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["src/InsuranceDetails.Api/InsuranceDetails.Api.csproj", "src/InsuranceDetails.Api/"]
+RUN dotnet restore "src/InsuranceDetails.Api/InsuranceDetails.Api.csproj"
+COPY . .
+WORKDIR "/src/src/InsuranceDetails.Api"
+RUN dotnet build "./InsuranceDetails.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./InsuranceDetails.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "InsuranceDetails.Api.dll"]
+```
+
+---
+# Docker compose
+
+- If docker file is recipe -> Compose is your menu
+
+---
+
+# Docker compose - Example
+```yml
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql
+    environment:
+      SA_PASSWORD: YourStrongPassword123!
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+  insurancedetails-api:
+    build:
+      context: .
+      dockerfile: src/InsuranceDetails.Api/Dockerfile
+    container_name: insurancedetails-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__InsuranceDetailsDb: "Server=sqlserver;Database=InsuranceDetailsDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;"
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - sqlserver
+
+volumes:
+  sqlserver-data:
+```
+
+---
+
+# Theory - Questions?
+
+---
+
+# COV - Controle op Verzekeringsgegevens
+
+![center](image.png)
+
+---
+
+# Questions?
+So far?
+
+---
+
+# Lets go!!
 
 ```
 https://www.rickneeft.dev/aspire-course-site/
@@ -40,119 +204,3 @@ https://www.rickneeft.dev/aspire-course-site/
 ```
 https://github.com/rneeft/workshop-vecozo-26-mei
 ```
-
----
-
-
-# Domein COV
-
----
-
-# Introduction to Docker
-
-- Docker is an open platform for developing, shipping, and running applications.
-- It uses containerization to package applications and their dependencies.
-- Containers are lightweight and portable.
-
----
-
-# Why Docker?
-
-- Consistency across environments
-- Lightweight and fast startup
-- Easier CI/CD pipelines
-- Better resource utilization
-
----
-
-# Docker vs Virtual Machines
-
-## Virtual Machines
-- Emulate entire hardware systems
-- Include a full OS
-- Heavy resource usage
-- Slow to boot
-
-## Docker Containers
-- Share the host OS kernel
-- Contain only application + dependencies
-- Lightweight
-- Fast to start
-
----
-
-# Architecture Comparison
-
-```
-VM:
-| Hardware |
-| Host OS |
-| Hypervisor |
-| Guest OS |
-| App |
-
-Docker:
-| Hardware |
-| Host OS |
-| Docker Engine |
-| Container (App + Dependencies) |
-```
-
----
-
-# What is a Dockerfile?
-
-- A text file with instructions to build a Docker image.
-- Defines the base image, dependencies, commands, etc.
-
-### Example Dockerfile
-```Dockerfile
-FROM node:18
-WORKDIR /app
-COPY . .
-RUN npm install
-CMD ["node", "index.js"]
-```
-
----
-
-# What is Docker Compose?
-
-- A tool for defining and running multi-container Docker applications.
-- Uses a YAML file (`docker-compose.yml`).
-- Manages services, networks, and volumes in one config.
-
-### Example docker-compose.yml
-```yaml
-version: '3'
-services:
-  web:
-    build: .
-    ports:
-      - "8080:8080"
-  db:
-    image: postgres
-```
-
----
-
-# Benefits of Docker Compose
-
-- Simplifies configuration for multi-container setups
-- Easy to scale services
-- Useful for local development and testing
-
----
-
-# Summary
-
-- Docker simplifies app deployment with containers
-- More efficient than virtual machines
-- Dockerfiles define how to build images
-- Docker Compose manages multi-container applications
-
----
-
-# Thank You!
-
-_Questions?_
