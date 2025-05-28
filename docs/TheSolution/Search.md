@@ -32,4 +32,4 @@ You can use one of the following example BSNs for testing:
 Enter the BSN in the request URL and click **Send**. The response will show the health insurance status for the specified patient.
 
 {: .important }
-> A BSN consists of 8 or 9 digits and must comply with the Elfproef (Eleven Test). The BSNs used in this workshop are fake and do **not comply** with the Elfproef. Never use your own or someone else's BSN for testing.
+> The BSNs used in this workshop are fake, never use your own or someone else's BSN for testing.

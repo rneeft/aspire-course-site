@@ -1,5 +1,5 @@
 ---
-title: Dependencies
+title: SQL Server
 parent: .NET Aspire
 layout: default
 nav_order: 2.1

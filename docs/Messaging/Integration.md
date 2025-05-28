@@ -66,7 +66,7 @@ Add the latest NuGet packages to your API project:
 
 ```bash
 dotnet add package NServiceBus
-dotnet add package NServiceBus.SqlServer
+dotnet add package NServiceBus.Transport.SqlServer
 dotnet add package NServiceBus.Extensions.Hosting
 ```
 
@@ -101,9 +101,10 @@ static void AddNServiceBus(WebApplicationBuilder builder)
 ```
 
 ## Step 5: Update the processing of the DataFile
-We still need to create an new implementation of the `IDataFileService`:
+We need to create an new implementation of the `IDataFileService` so that the messages are send in commands and not directly to the datbase.
 
 - Add a new class to `InsuranceDetails.Api.DataFiles` names: `NServiceBusDataFileService`
+
 ```csharp
 using FluentValidation;
 using InsuranceDetails.Messages.Commands;
@@ -195,7 +196,7 @@ In order to see the data execute the following SQL query:
 
 ```sql
 SELECT *
-FROM [MessagesDb].[dbo].[DataFileProcessorEndpoint]
+FROM [MessagesDb].[dbo].[DataFileProcessorEndpoint] WITH (NOLOCK)
 ```
 
 ## Next steps
