@@ -40,32 +40,84 @@ Once connected, you should see the databases listed, including the new `Identity
 
 Now, let's separate the identity logic from the main API project by creating a dedicated web application for identity management.
 
-- Create a new WebApplication in your solution and name it `InsuranceDetails.IP`.
+- Create a new Web API application in your solution and name it `InsuranceDetails.Api.IdentityProvider`.
 
 {: .highlight }
 > This may seem counterintuitive but create the new web application **without authentication**.
 
 ## Step 5: Move Identity-Related Code
 
-Move the necessary files from the old API project to the new Identity Provider project.  
-This typically includes (but is not limited to):
+- Add a reference to the `ServiceDefault` project 
+- NuGet packages
+```bash
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Konscious.Security.Cryptography.Argon2
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+```
+- Copy the content of the `appsettings` from the API to the new project
+- Move the content of the `IdentityProvider` folder to the new project
+- Add a new folder `Database` to the project and copy `AppDbContext.cs`, `User.cs`, `sql-create.sql` and `DatabaseInitialisation` files from the API to the new folder
+- In `AppDbContext.cs` remove everything except code that has something to do with `User`
+- Replace the content of the `sql-create.sql` script with the following:
+```sql
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='User')
+CREATE TABLE [User] (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(MAX) NOT NULL,
+    Email NVARCHAR(MAX) NOT NULL,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
+    Salt VARBINARY(MAX) NOT NULL
+);
+```
+- Replace the content of program.cs with the following code:
 
-- NuGet packages like `Microsoft.EntityFrameworkCore` and `Konscious.Security.Cryptography.Argon2`
-- JWT generator
-- PasswordHasher
-- `appsettings` configuration
+```csharp
+using InsuranceDetails.Api.Database;
+using InsuranceDetails.Api.IdentityProvider;
+using InsuranceDetails.Api.IdentityProvider.Database;
+using Microsoft.EntityFrameworkCore;
 
-{: .highlight }
-> Only move files related to authentication and identity management.
+var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
 
-## Step 6: Clean Up the API Project
+var connectionString = builder.Configuration.GetConnectionString("InsuranceDetailsDb") ?? 
+                       throw new InvalidOperationException("No connection string configured");
 
-After moving the relevant files, remove them from the original API project to avoid duplication and confusion.
+DatabaseInitialisation.CreateTheDatabase(connectionString, "InsuranceDetails.Api.IdentityProvider.Database.sql-create.sql");
 
-## Step 7: Add the project to Aspire and apply Aspire to the project
+builder.Services
+    .AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString))
+    .AddIdentityProviderServices(builder.Configuration);
 
-Register your new Identity Provider project in your Aspire AppHost configuration and make sure it connect to the correct database.
+var app = builder.Build();
+app.MapDefaultEndpoints();
 
-## Step 8: Test the connection
+app.MapIdentityProviderEndpoints();
+
+app.UseHttpsRedirection();
+
+app.Run();
+
+```
+
+## Step 6: Clean up API project
+Let clean up the API project
+
+- In `Database\AppDbContext` and `Database\sql-create.sql` remove code specfic to users
+- Delete the `Database\user.cs` file
+- In `program.cs` remove the line that do not compile
+
+## Step 6: Add the project to Aspire and apply Aspire to the project
+
+Register your new Identity Provider project in your Aspire AppHost project. Add the following code to that program.cs file in the app host
+
+```csharp
+builder
+    .AddProject<Projects.InsuranceDetails_Api_IdentityProvider>("idp")
+    .WithReference(identityDatabase)
+    .WaitFor(identityDatabase);
+```
+
+## Step 7: Test the connection
 
 Verify that everything keeps running in Postman. Make sure to use the correct URL when connection to the identity provider.
