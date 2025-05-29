@@ -214,8 +214,8 @@ builder
     .AddProject<Projects.InsuranceDetails_Processor>("Processor")
     .WithReference(apiDatabase)
     .WaitFor(apiDatabase)
-    .WithReference(messagesDb)
-    .WaitFor(messagesDb);
+    .WithReference(messages)
+    .WaitFor(messages);
 ```
 
 ## Step 5: Test
@@ -249,8 +249,8 @@ builder
     .WithReplicas(5)
     .WithReference(apiDatabase)
     .WaitFor(apiDatabase)
-    .WithReference(messagesDb)
-    .WaitFor(messagesDb);
+    .WithReference(messages)
+    .WaitFor(messages);
 ```
 
 Aspire is now instructed to run the application `5` times, which will increase the message handling. 

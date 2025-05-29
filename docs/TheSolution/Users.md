@@ -14,7 +14,7 @@ An **Identity Provider** (IdP) is a service responsible for managing user identi
 To create a user, use the `/identity/create` request in Postman:
 
 1. Open the `/identity/create` request in the Postman collection.
-2. In the **Body** section, fill in the `username`, `email`, and `password`.
+2. In the **Body** section, fill in the `username`, `email`, and `password`. It is easy to make use the eamil address ends with `workshop.nl`.
 3. Click **Send**.
 
 {: .highlight }

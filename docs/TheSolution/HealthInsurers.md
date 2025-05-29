@@ -6,7 +6,7 @@ nav_order: 1.3
 ---
 
 # Health Insurer
-In our system health insurance data is processed and can be queried by healthcare providers like docters, hospitals, dentists etc. Health insurers can upload their health care policies. Lets create a health insurer in the system. 
+In our system health insurance data is processed and can be queried by healthcare providers like doctors, hospitals, dentists etc. Health insurers can upload their health care policies. Lets create a health insurer in the system. 
 
 To create a health insurer:
 
@@ -20,6 +20,8 @@ Create two health insurers.
 After creating a health insurer, you can retrieve it using the **GET** request to `/HealthInsurers`. The response will include an `apiKey`, which is the second way to authenticate in the system.
 
 ## X-API-KEY Authentication
+
+Health insurere normally connects to other services though server-to-server communication. To setup authentication between the servers the system is using API Key authentication. The API key is generated when a new Health insurer is created. 
 
 With X-API-KEY authentication, you include the `apiKey` in the request header:
 

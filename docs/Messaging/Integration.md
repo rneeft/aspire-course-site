@@ -13,19 +13,19 @@ In this lesson, you will integrate NServiceBus into your solution to handle Data
 
 In the Aspire AppHost, create a new database for messages and add a reference to your API project.
 
-- Find the `nservicebus.sql` script in the `docs` folder.
-- Add `nservicebus.sql` to the AppHost project and ensure it is copied to the output directory.
 - Add the following code to `program.cs` in the AppHost:
 
 ```csharp
 var sqlScript = await File.ReadAllTextAsync("nservicebus.sql");
 var messages = sqlServer
-    .AddDatabase("MessagesDb")
-    .WithCreationScript(sqlScript);
+    .AddDatabase("MessagesDb");
 ```
 
-- Add the messages database `WithReference` to the API project and use `WaitFor` to ensure it wait for it to be ready.
-
+Add the following 2 lines to the API project
+```csharp
+    .WithReference(messages)
+    .WaitFor(messages);
+```
 
 ## Step 2: Create a Shared Class Library
 
@@ -58,7 +58,7 @@ public class UpdateSupplementaryHealthInsuranceCommand : ICommand
 }
 ``` 
 
-- Reference this library from both the API and processor projects.
+- In the API project add a reference to this shared project
 
 ## Step 2: Add NServiceBus Packages
 
@@ -72,7 +72,7 @@ dotnet add package NServiceBus.Extensions.Hosting
 
 ## Step 3: Configure NServiceBus in the API
 
-Add the following NServiceBus configuration to your API project and make sure the method is called:
+Add the following NServiceBus configuration to the `program.cs` of the API project and make sure the method is called:
 
 ```csharp
 static void AddNServiceBus(WebApplicationBuilder builder)
@@ -80,6 +80,8 @@ static void AddNServiceBus(WebApplicationBuilder builder)
     var connectionString = builder.Configuration.GetConnectionString("MessagesDb") ?? 
                            throw new InvalidOperationException("No connection string configured");
     
+    DatabaseInitialisation.CreateTheDatabase(connectionString, "InsuranceDetails.Api.Database.messages.sql");
+
     var endpointConfiguration = new EndpointConfiguration("DataFileUploadEndpoint");
     endpointConfiguration.UseSerialization<SystemJsonSerializer>();
     endpointConfiguration.SendOnly();

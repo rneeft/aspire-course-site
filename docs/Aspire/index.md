@@ -23,11 +23,11 @@ If aspire is not listed, install the workload using the following command:
 dotnet workload install aspire
 ``` 
 
-When everything is setup, lets create the .NET Aspire projects. Navigate to the source directory `src` and create two projects and add them to the solution:
+When everything is setup, lets create the .NET Aspire projects. Navigate to the source directory `src` and create two projects. If you create them in the command line, do not forget to add them to the solution:
 
 ```bash
-dotnet new aspire-apphost -o InsuranceDetails.AppHost
-dotnet new aspire-servicedefaults -o InsuranceDetails.ServiceDefaults
+dotnet new aspire-apphost -o InsuranceDetails.AppHost --framework net9.0
+dotnet new aspire-servicedefaults -o InsuranceDetails.ServiceDefaults --framework net9.0
 ```
 
 or create them in your preferred IDE. 
@@ -65,4 +65,4 @@ builder.AddProject<Projects.InsuranceDetails_Api>("api");
 builder.Build().Run();
 ``` 
 
-With this change we are almost ready. The project also need a SQL Server and a SQL Database. Lets add that dependency in the [next section](/dependencies).
+With this change we are almost ready. The project also need a SQL Server and a SQL Database. Lets add that dependency in the [next section](dependencies).

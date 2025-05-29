@@ -48,6 +48,8 @@ builder.Build().Run();
 
 In our API project, we use `WithReference` to link the SQL database, making the connection string available as an environment variable. The `WaitFor` method instructs Aspire to wait for the database to become healthy before starting our API project.
 
+Start the AppHost.
+
 The Aspire Dashboard will appear as shown below:
 ![Aspire Dashboard](aspire-dashboard.png)
 
