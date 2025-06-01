@@ -16,7 +16,6 @@ In the Aspire AppHost, create a new database for messages and add a reference to
 - Add the following code to `program.cs` in the AppHost:
 
 ```csharp
-var sqlScript = await File.ReadAllTextAsync("nservicebus.sql");
 var messages = sqlServer
     .AddDatabase("MessagesDb");
 ```
