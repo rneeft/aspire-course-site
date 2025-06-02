@@ -55,7 +55,7 @@ And the following line under the `var app = ...` line:
 app.MapDefaultEndpoints();
 ```
 
-The `InsuranceDetails.Api` project is now ready to be included in the Aspire's `AppHost`. Replace the following code in the `InsuranceDetails.AppHost` `program.cs`:
+The `InsuranceDetails.Api` project is now ready to be included in the Aspire's `AppHost`. Replace the following code in the `InsuranceDetails.AppHost` `AppHost.cs`:
 
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
