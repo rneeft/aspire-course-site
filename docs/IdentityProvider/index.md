@@ -74,13 +74,13 @@ CREATE TABLE [User] (
 ```csharp
 using InsuranceDetails.Api.Database;
 using InsuranceDetails.Api.IdentityProvider;
-using InsuranceDetails.Api.IdentityProvider.Database;
+using InsuranceDetails.Api.Database;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
-var connectionString = builder.Configuration.GetConnectionString("InsuranceDetailsDb") ?? 
+var connectionString = builder.Configuration.GetConnectionString("IdentityDb") ?? 
                        throw new InvalidOperationException("No connection string configured");
 
 DatabaseInitialisation.CreateTheDatabase(connectionString, "InsuranceDetails.Api.IdentityProvider.Database.sql-create.sql");

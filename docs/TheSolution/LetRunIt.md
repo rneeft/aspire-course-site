@@ -21,7 +21,7 @@ This command will build the Docker images (if needed) and start all the required
 
 ## 2. Import the Postman collection
 
-In the `docs` folder, you'll find a Postman collection file. Import this file into Postman:
+In the `docs` folder, you'll find a Postman collection file. Import this file into Postman, It could be that you need an account to do this.
 
 1. Open Postman.
 2. Click **Import**.
