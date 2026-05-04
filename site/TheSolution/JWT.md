@@ -1,13 +1,67 @@
 ---
 title: JSON Web Token
 layout: home
-parent: Users
+parent: Identity API
 nav_order: 1.2.1
 ---
 
 # JSON Web Token (JWT)
 
-A **JSON Web Token (JWT)** is an open standard ([RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519)) for securely transmitting information between parties as a JSON object. JWTs are widely used for authentication and authorization in modern web applications, especially in microservices architectures.
+A **JSON Web Token (JWT)** is an open standard ([RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519)) for securely transmitting information between parties as a compact, self-contained JSON object.
+
+## Structure
+
+A JWT consists of three base64url-encoded parts separated by dots:
+
+```
+HEADER.PAYLOAD.SIGNATURE
+```
+
+| Part | Contains |
+|------|----------|
+| **Header** | Token type (`JWT`) and signing algorithm (`HS256`) |
+| **Payload** | Claims — statements about the subject and metadata |
+| **Signature** | HMAC-SHA256 of `header + "." + payload`, signed with the secret key |
+
+Paste any token into [jwt.io](https://jwt.io/) to inspect it.
+
+## Claims used in this system
+
+All tokens issued by IdentityApi share the same structure:
+
+```json
+{
+  "sub": "<identifier>",
+  "role": "<Patient | HealthcareCompany | Internal>",
+  "iss": "Online-Toestemming-Workshop-IdentityApi",
+  "aud": "Online-Toestemming-Workshop",
+  "exp": 1234567890
+}
+```
+
+| Claim | Value for each role |
+|-------|--------------------|
+| `sub` | Patient → pseudoniem GUID; Company → company name; Internal → `"internal"` |
+| `role` | `Patient`, `HealthcareCompany`, or `Internal` |
+| `exp` | 15 minutes from issue time |
+
+## Signature and the shared secret
+
+Every service — IdentityApi, PseudoniemApi, DossierApi, PatientWebsite — receives the **same** `JwtSettings__SecretSigningKey` at startup (from the `.env` file via Docker Compose, or from Aspire parameters). This means any service can verify any token without calling IdentityApi.
+
+{: .warning }
+> In this workshop the secret is injected as a plain environment variable. In production, use a secret manager such as [Azure Key Vault](https://azure.microsoft.com/en-us/products/key-vault/) or [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/).
+
+## Why JWTs instead of sessions in microservices?
+
+| | Sessions | JWTs |
+|-|----------|------|
+| State | Server-side session store required | Stateless — all data is in the token |
+| Verification | Must call session store per request | Any service with the key can verify |
+| Scalability | Shared session store becomes a bottleneck | Scales horizontally with no shared state |
+
+{: .note }
+> The payload is **not encrypted**, only signed. Do not put sensitive data (such as a raw BSN) in the payload.
 
 ## Structure of a JWT
 

@@ -3,6 +3,7 @@ title: NServiceBus
 parent: Messaging
 layout: default
 nav_order: 4.1
+nav_exclude: true
 ---
 
 # NServiceBus

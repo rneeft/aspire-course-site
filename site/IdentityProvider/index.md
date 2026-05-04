@@ -2,6 +2,7 @@
 title: Identity Provider
 layout: default
 nav_order: 3
+nav_exclude: true
 ---
 
 # Identity Provider

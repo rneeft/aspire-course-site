@@ -3,6 +3,7 @@ title: Integration
 parent: Messaging
 layout: default
 nav_order: 4.2
+nav_exclude: true
 ---
 
 # NServiceBus Integration
