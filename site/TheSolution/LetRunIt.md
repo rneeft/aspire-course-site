@@ -13,13 +13,13 @@ Let's start the entire platform with a single command and verify it's working.
 
 The Docker Compose setup requires two environment variables. In the project root, create a file called `.env`:
 
-```
+```ini
 SQL_PASSWORD=YourStr0ngPassword!
-JWT_SECRET_KEY=ThisIsASecretKeyForJwtSigningPleaseChangeIt
+JWT_SECRET_KEY=ThisIsASecretKeyForJwtSigningPleaseChangeItInProduction
 ```
 
 {: .note }
-> `JWT_SECRET_KEY` must be at least 32 characters long. All services share this key, so they can all verify each other's tokens.
+> `JWT_SECRET_KEY` must be at least 44 characters long. All services share this key, so they can all verify each other's tokens.
 
 ## 2. Start the application
 
@@ -39,7 +39,7 @@ The only externally exposed port is **8080** (PatientWebsite).
 
 ## 3. Import the Bruno collection
 
-[Bruno](https://www.usebruno.com/) is an open-source API client similar to Postman. The workshop provides a Bruno collection under `docs/Bruno/`.
+[Bruno](https://www.usebruno.com/) is a free open-source API client. The workshop provides a Bruno collection under `docs/Bruno/`.
 
 1. Open Bruno.
 2. Click **Open Collection**.

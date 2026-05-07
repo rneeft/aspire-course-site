@@ -8,7 +8,7 @@ permalink: TheSolution/
 
 # The Solution
 
-**Online Toestemming** (Online Consent) is a healthcare consent platform. Patients can log in and decide if healthcare companies may share records. Healthcare companies can register themselves and create dossiers for patients. The system enforces consent: a company cannot read a patient's data without explicit approval.
+**Online Toestemming** (Online Consent) is a healthcare consent platform. Patients can log in and decide if healthcare companies may share records. Healthcare companies can register themselves and create dossiers for patients.
 
 ## The privacy challenge
 

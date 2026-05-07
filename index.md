@@ -8,7 +8,6 @@ nav_order: 0
 
 This website is the central hub for the  **Microservices course with .NET Aspire**.
 
- 
 Explore the materials, follow the workshops, and learn how to design and implement microservices using .NET Aspire!
 
 ## Prerequisites
