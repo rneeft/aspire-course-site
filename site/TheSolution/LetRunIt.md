@@ -26,7 +26,7 @@ JWT_SECRET_KEY=ThisIsASecretKeyForJwtSigningPleaseChangeItInProduction
 Open a terminal in the project root and run:
 
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
 Docker will:
@@ -35,7 +35,6 @@ Docker will:
 3. Run the **MigrationService** to create the database schema, then exit
 4. Start **IdentityApi**, **PseudoniemApi**, **DossierApi**, and **PatientWebsite**
 
-The only externally exposed port is **8080** (PatientWebsite).
 
 ## 3. Import the Bruno collection
 
@@ -64,5 +63,6 @@ Open the **Dossier → FullTestSequence** file in Bruno. It documents the comple
 
 Run the requests in order. In the next pages you'll understand exactly what each service is doing.
 
-{: .note }
-> When checking permission before the patient has registered, `GavePermission` is `false`. Once the patient logs in and clicks **Approve**, it becomes `true`.
+You can also run then all by right clicking the 'OnlineToestemming' folder and click on Run. Leave the defaults as is and click on 'Run 9 Requests'. 
+
+Lets explore what we have running by looking at the [Identity Api](IdentityApi).

@@ -60,13 +60,8 @@ Authorization: Bearer <company_token>
 
 Returns whether the patient has approved access for the calling company:
 
-```json
-{ "bsn": "123456780", "companyId": "...", "gavePermission": false }
-```
-
-- `gavePermission: false` if no dossier exists, or the patient has not yet approved.
-- `gavePermission: true` once the patient clicks **Approve** in the PatientWebsite.
-- Always returns `200 OK` (never `404`) — absence of a dossier is not an error.
+- `200 OK` if the patient has approved sharing for the calling company.
+- `403 Forbidden` if no dossier exists, or the patient has not yet approved.
 
 ## Deleting a dossier
 

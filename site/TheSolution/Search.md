@@ -7,7 +7,7 @@ nav_order: 1.5
 
 # Patient Website
 
-The **PatientWebsite** is the only service reachable from outside the Docker network. It runs on `http://localhost:8080`.
+The **PatientWebsite** is the only service with a frontend. It runs on `http://localhost:8080`.
 
 It is a server-rendered Razor Pages application that allows patients to:
 
