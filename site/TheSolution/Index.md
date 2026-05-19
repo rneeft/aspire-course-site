@@ -67,4 +67,4 @@ graph TB
 2. Walk through each service using the **Bruno** API collection
 3. Understand how JWT tokens, pseudonymisation, and service-to-service authentication work together
 
-Ready? [Let's run it](LetsGiveItAGo).
+Ready? [Lets give it a go](LetsGiveItAGo).
