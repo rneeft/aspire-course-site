@@ -106,4 +106,4 @@ docker ps
 
 You should see the SQL Server container running. The .NET projects run as processes (not containers) in Aspire by default.
 
-Continue to the [Dashboard](Dashboard).
+Continue to the [Dashboard](AspireDashboard).

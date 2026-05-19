@@ -72,4 +72,4 @@ Authorization: Bearer <company_token>
 
 Removes the dossier for the calling company and the given patient. Returns `204 No Content` if deleted, `404 Not Found` if no dossier existed.
 
-## Next: [Patient Website](Search)
+## Next: [Patient Website](PatientWebsite)

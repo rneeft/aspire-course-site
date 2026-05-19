@@ -41,4 +41,4 @@ In Bruno, open **Identity → GetInternalToken** and send the request to populat
 
 Try changing the token to `company_token` — you should get a `403 Forbidden`.
 
-## Next: [Dossier API](DataFile)
+## Next: [Dossier API](DossierApi)

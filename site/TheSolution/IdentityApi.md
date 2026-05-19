@@ -8,7 +8,7 @@ has_children: true
 
 # Identity API
 
-The **IdentityApi** is the authentication service. It issues [JSON Web Tokens (JWT)](JWT) to three different types of caller, each with a different role:
+The **IdentityApi** is the authentication service. It issues [JSON Web Tokens (JWT)](JSONWebToken) to three different types of caller, each with a different role:
 
 | Role | Endpoint | Who uses it |
 |------|----------|-------------|
@@ -54,4 +54,4 @@ DossierApi calls this endpoint automatically when it needs to contact Pseudoniem
 {: .warning }
 > In this workshop the token endpoint has no guard. In production you would protect it with mTLS, network policy, or a client credential.
 
-## Next: [Pseudoniem API](HealthInsurers)
+## Next: [Pseudoniem API](PseudoniemApi)

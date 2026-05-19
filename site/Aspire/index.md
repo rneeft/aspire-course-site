@@ -64,4 +64,4 @@ app.MapDefaultEndpoints();
 {: .note }
 > `Data.MigrationService` is a `IHostBuilder` worker, not a web app. Add only `builder.AddServiceDefaults()` — there is no `app.MapDefaultEndpoints()` call.
 
-When that is done, continue to the [AppHost setup](dependencies).
+When that is done, continue to the [AppHost setup](AppHostSetup).
