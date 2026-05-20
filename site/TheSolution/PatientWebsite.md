@@ -47,8 +47,8 @@ Clicking **Approve** sets `Patient.GavePermission = true` in the database. The n
 
 1. Register a patient at `http://localhost:8080/Register`
 2. In Bruno, run `Dossier/RegisterCompany` then `Identity/GetToken` then `Dossier/CreateDossier`
-3. Check `Dossier/CheckPatientPermission` — `gavePermission` should be `false`
+3. Check `Dossier/CheckPatientPermission` — `gavePermission` should be `403 - Forbidden`
 4. Sign in to the patient website and click **Approve**
-5. Check `Dossier/CheckPatientPermission` again — `gavePermission` should now be `true`
+5. Check `Dossier/CheckPatientPermission` again — `gavePermission` should now be `202 - OK`
 
 Now that you understand the full solution, let's improve the local development experience by adding [.NET Aspire](../Aspire/).
